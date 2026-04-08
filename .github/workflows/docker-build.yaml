@@ -48,7 +48,6 @@ jobs:
           # Use static (v1) and latest tags
           tags: |
             ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG_VERSION }}
-            ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:v10.9
 
       # --- WEB APP RESTART / CONTAINER UPDATE ---
       - name: Trigger Web App Update/Restart
@@ -61,4 +60,5 @@ jobs:
           # Authentication: The entire contents of the Publish Profile XML secret
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           # Deployment: Tell the Web App to use the new image we just pushed to ACR
-          images: ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:v10.9
+          #images: ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:v10.9
+          images: ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG_VERSION }}
