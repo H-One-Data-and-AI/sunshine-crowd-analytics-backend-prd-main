@@ -1,0 +1,13 @@
+__pycache__
+*.pyc
+.git
+.gitignore
+tests
+docs
+*.log
+.vscode
+.venv
+venv
+*.egg-info
+*.sqlite
+*.sqlite3
