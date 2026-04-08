@@ -15,10 +15,10 @@ from settings import DB_PATH
 
 
 app = FastAPI(
-    title="Crowd Analytics API",
-    docs_url=SHOW_DOCS_URL,   
-    redoc_url=SHOW_REDOC_URL,
-    openapi_url=SHOW_OPENAPI_URL
+    title="Crowd Analytics API"
+    #docs_url=SHOW_DOCS_URL,   
+    #redoc_url=SHOW_REDOC_URL,
+    #openapi_url=SHOW_OPENAPI_URL
 )
 
 origins = [
