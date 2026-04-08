@@ -23,8 +23,8 @@ app = FastAPI(
 
 origins = [
     "http://localhost:8000",                          
-    "https://sunshineca-be-sea-cve5agcaawg6etd8.southeastasia-01.azurewebsites.net/",
-    "https://sunshineca-be-sea-cve5agcaawg6etd8.southeastasia-01.azurewebsites.net" 
+    "https://sunshineca-be-sea.azurewebsites.net/",
+    "https://sunshineca-be-sea.azurewebsites.net" 
 ]
 
 app.add_middleware(
