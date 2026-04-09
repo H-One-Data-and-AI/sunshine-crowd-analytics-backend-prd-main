@@ -4,6 +4,9 @@ on:
   # Triggers the workflow on push to the main branch
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ "main" ]
+  
   # Allows manual runs from the GitHub Actions tab
   workflow_dispatch:
 
@@ -39,16 +42,21 @@ jobs:
           password: ${{ secrets.ACR_PASSWORD }}
             
       # --- BUILD AND PUSH ---
-      - name: Build and Push Docker Image to ACR
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          # Enable push to the logged-in registry (ACR)
-          push: true
-          # Use static (v1) and latest tags
-          tags: |
-            ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG_VERSION }}
-            ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:v10.9
+      # - name: Build and Push Docker Image to ACR
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     # Enable push to the logged-in registry (ACR)
+      #     push: true
+      #     # Use static (v1) and latest tags
+      #     tags: |
+      #       ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:v10.9
+
+       # 2. Build and Push (Simpler command)
+      - name: Build and Push Docker image
+        run: |
+          docker build . --file Dockerfile --tag ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:v10.9
+          docker push ${{ secrets.ACR_REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:v10.9
 
       # --- WEB APP RESTART / CONTAINER UPDATE ---
       - name: Trigger Web App Update/Restart
