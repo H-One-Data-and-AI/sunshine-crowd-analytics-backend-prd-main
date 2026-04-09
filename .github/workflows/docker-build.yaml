@@ -1,72 +1,37 @@
-name: Build and Push FastAPI to Azure Container Registry
+name: Build and Deploy to Azure (ACR)
 
 on:
-  # Triggers the workflow on push to the main branch
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  
-  # Allows manual runs from the GitHub Actions tab
-  workflow_dispatch:
 
-# Define environment variables to centralize configuration
-env:
-  ACR_REGISTRY: ${{ secrets.ACR_REGISTRY_NAME }}
-  IMAGE_NAME: 'sunchineca-be' # Updated image name
-  TAG_VERSION: 'v1' # Static version tag
-  
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # Best Practice: Set up QEMU for multi-platform build compatibility
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # --- ACR AUTHENTICATION ---
-      - name: Login to Azure Container Registry (ACR)
-        uses: docker/login-action@v3
+      # 1. Login to Azure Container Registry
+      - name: Login to ACR
+        uses: azure/docker-login@v1
         with:
-          # Uses the full ACR registry URL (e.g., myregistry.azurecr.io)
-          registry: ${{ env.ACR_REGISTRY }}
-          # Uses the ACR Admin/Service Account credentials
-          username: ${{ secrets.ACR_USERNAME }} 
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
-            
-      # --- BUILD AND PUSH ---
-      # - name: Build and Push Docker Image to ACR
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: .
-      #     # Enable push to the logged-in registry (ACR)
-      #     push: true
-      #     # Use static (v1) and latest tags
-      #     tags: |
-      #       ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:v10.9
 
-       # 2. Build and Push (Simpler command)
+      # 2. Build and Push (Simpler command)
       - name: Build and Push Docker image
         run: |
-          docker build . --file Dockerfile --tag ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:v10.9
-          docker push ${{ secrets.ACR_REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:v10.9
+          docker build . --file Dockerfile --tag ${{ secrets.ACR_LOGIN_SERVER }}/sunchineca-be:${{ github.sha }}
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/sunchineca-be:${{ github.sha }}
 
-      # --- WEB APP RESTART / CONTAINER UPDATE ---
-      - name: Trigger Web App Update/Restart
+      # 3. Deploy to Azure Web App
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          # Required: Name of the Azure Web App
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-          # Recommended: Resource Group name for context
-          resource-group-name: ${{ secrets.AZURE_RESOURCE_GROUP }}
-          # Authentication: The entire contents of the Publish Profile XML secret
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          # Deployment: Tell the Web App to use the new image we just pushed to ACR
-          images: ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:v10.9
+          # This tells Azure exactly which image to pull from ACR
+          images: '${{ secrets.ACR_LOGIN_SERVER }}/sunchineca-be:${{ github.sha }}'
