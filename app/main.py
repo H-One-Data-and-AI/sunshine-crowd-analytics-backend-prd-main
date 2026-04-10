@@ -9,16 +9,16 @@ from pydantic import BaseModel
 import sqlite3
 from settings import DB_PATH
 
-SHOW_DOCS_URL = "/docs" if os.getenv("ENVIRONMENT") == "development" else None
-SHOW_REDOC_URL = "/redoc" if os.getenv("ENVIRONMENT") == "development" else None
-SHOW_OPENAPI_URL = "/openapi.json" if os.getenv("ENVIRONMENT") == "development" else None
+# SHOW_DOCS_URL = "/docs" if os.getenv("ENVIRONMENT") == "development" else None
+# SHOW_REDOC_URL = "/redoc" if os.getenv("ENVIRONMENT") == "development" else None
+# SHOW_OPENAPI_URL = "/openapi.json" if os.getenv("ENVIRONMENT") == "development" else None
 
 
 app = FastAPI(
-    title="Crowd Analytics API",
-    docs_url=SHOW_DOCS_URL,   
-    redoc_url=SHOW_REDOC_URL,
-    openapi_url=SHOW_OPENAPI_URL
+    title="Crowd Analytics API"
+    # docs_url=SHOW_DOCS_URL,   
+    # redoc_url=SHOW_REDOC_URL,
+    # openapi_url=SHOW_OPENAPI_URL
 )
 
 origins = [
